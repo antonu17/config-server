@@ -1,0 +1,4 @@
+kind_cluster_name: demo-env
+kind_cluster_config_path: "{{ ansible_env.TMPDIR }}/demo-kind.yml"
+kind_image: kindest/node:v1.18.2
+kind_expose_port: 8080
