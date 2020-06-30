@@ -2,3 +2,10 @@ kind_cluster_name: demo-env
 kind_cluster_config_path: "{{ ansible_env.TMPDIR }}/demo-kind.yml"
 kind_image: kindest/node:v1.18.2
 kind_expose_port: 8080
+
+kind_preload_images:
+  - docker.io/bitnami/postgresql:11.5.0-debian-9-r60
+  - concourse/concourse:6.3.0
+  - docker.io/bitnami/minideb:stretch
+  - quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.32.0
+  - k8s.gcr.io/defaultbackend-amd64:1.5

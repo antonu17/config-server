@@ -36,6 +36,7 @@ options:
             - C(create) ensure the cluster is created
             - C(delete) ensure the cluster is deleted
             - C(status) return current cluster status
+            - C(load) upload docker image into kind cluster
         type: str
         choices: [ create, delete, status ]
         required: false
@@ -123,11 +124,21 @@ def kind_delete_cluster(module):
     return module.run_command(args, use_unsafe_shell=True)
 
 
+def kind_load_image(module):
+    name = module.params['name']
+    image = module.params['image']
+    args = [kind_binary, "load", "docker-image", "--name", name, image]
+
+    return module.run_command(args, use_unsafe_shell=True)
+
+
 def run_module():
+    global kind_binary, kind_kubeconfig_args
+
     module_args = dict(
         name=dict(type='str', required=True),
         config=dict(type='str', required=False),
-        action=dict(type='str', choices=['create', 'delete', 'status'], default='create'),
+        action=dict(type='str', choices=['create', 'delete', 'status', 'load'], default='create'),
         binary=dict(type='str', required=False, default='kind'),
         image=dict(type='str', required=False),
         kubeconfig=dict(type='str', required=False)
@@ -155,6 +166,7 @@ def run_module():
             if rc != 0:
                 module.fail_json(msg='error running kind', rc=rc, out=out, err=err)
             result['changed'] = True
+            result['status'] = 'created'
 
     if module.params['action'] == 'delete':
         if kind_cluster_exists(module):
@@ -162,6 +174,19 @@ def run_module():
             if rc != 0:
                 module.fail_json(msg='error running kind', rc=rc, out=out, err=err)
             result['changed'] = True
+            result['status'] = 'deleted'
+
+    if module.params['action'] == 'load':
+        if kind_cluster_exists(module):
+            rc, out, err = kind_load_image(module)
+            if rc != 0:
+                module.fail_json(msg='error running kind', rc=rc, out=out, err=err)
+            if err:
+                result['changed'] = True
+            result['status'] = out
+        else:
+            module.fail_json(msg='kind cluster is not created', rc=rc, out=out, err=err)
+
 
     if module.params['action'] == 'status':
         result['status'] = 'created' if kind_cluster_exists(module) else 'deleted'

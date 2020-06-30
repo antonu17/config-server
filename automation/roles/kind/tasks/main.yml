@@ -13,3 +13,16 @@
     name: "{{ kind_cluster_name }}"
     action: create
     config: "{{ kind_cluster_config_path }}"
+
+- name: pull preload images
+  docker_image:
+    name: "{{ item }}"
+    source: pull
+  with_items: "{{ kind_preload_images }}"
+
+- name: upload images into kind cluster
+  kind:
+    name: "{{ kind_cluster_name }}"
+    action: load
+    image: "{{ item }}"
+  with_items: "{{ kind_preload_images }}"
