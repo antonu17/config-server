@@ -1,0 +1,22 @@
+- name: add stable chart repo
+  community.kubernetes.helm_repository:
+    binary_path: "{{ helm_binary_path }}"
+    name: "{{ item.name }}"
+    repo_url: "{{ item.repo_url }}"
+  with_items: "{{ helm_repos }}"
+
+- name: create helm namespaces
+  community.kubernetes.k8s:
+    api_version: v1
+    kind: Namespace
+    name: "{{ item }}"
+    wait: true
+  with_items: "{{ helm_releases | map(attribute='namespace') | unique | list }}"
+
+- name: install helm charts
+  community.kubernetes.helm:
+    binary_path: "{{ helm_binary_path }}"
+    name: "{{ item.name }}"
+    chart_ref: "{{ item.chart }}"
+    release_namespace: "{{ item.namespace }}"
+  with_items: "{{ helm_releases }}"

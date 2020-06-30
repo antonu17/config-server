@@ -1,0 +1,15 @@
+helm_binary_path: helm3
+
+helm_repos:
+  - name: stable
+    repo_url: https://kubernetes-charts.storage.googleapis.com
+  - name: concourse
+    repo_url: https://concourse-charts.storage.googleapis.com/
+
+helm_releases:
+  - name: nginx-ingress
+    chart: stable/nginx-ingress
+    namespace: default
+  - name: concourse
+    chart: concourse/concourse
+    namespace: default

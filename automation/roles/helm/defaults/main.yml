@@ -1,0 +1,12 @@
+helm_binary_path: helm
+
+helm_repos:
+  - name: stable
+    repo_url: https://kubernetes-charts.storage.googleapis.com
+
+helm_releases: []
+
+# helm_releases:
+#   - name: nginx-ingress
+#     chart: stable/nginx-ingress
+#     namespace: default

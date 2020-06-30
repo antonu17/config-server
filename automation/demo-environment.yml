@@ -6,6 +6,7 @@
 
   roles:
     - { role: kind,          tags: ["kind"]                }
+    - { role: helm,          tags: ["helm"]                }
 
 - name: Cleanup
   hosts: localhost
