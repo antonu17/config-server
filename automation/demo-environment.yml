@@ -1,0 +1,5 @@
+- name: Create demo kubernetes environment
+  hosts: localhost
+
+  roles:
+    - { role: kind,          tags: ["kind"]                }
