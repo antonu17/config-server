@@ -1,5 +1,3 @@
-helm_binary_path: helm3
-
 helm_repos:
   - name: stable
     repo_url: https://kubernetes-charts.storage.googleapis.com
@@ -19,3 +17,16 @@ helm_releases:
   - name: concourse
     chart: concourse/concourse
     namespace: default
+    release_values:
+      secrets:
+        localUsers: "demo:demo"
+      concourse:
+        web:
+          auth:
+            mainTeam:
+              localUser: "demo"
+          externalUrl: "http://{{ ci_host }}:{{ kind_port_mapping_host }}"
+      web:
+        ingress:
+          enabled: true
+          hosts: ["{{ ci_host }}"]
