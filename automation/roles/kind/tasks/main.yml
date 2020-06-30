@@ -1,0 +1,15 @@
+- name: ensure kind image pulled
+  docker_image:
+    name: "{{ kind_image }}"
+    source: pull
+
+- name: generate kind config
+  template:
+    src: kind.yml
+    dest: "{{ kind_cluster_config_path }}"
+
+- name: create kind cluster
+  kind:
+    name: "{{ kind_cluster_name }}"
+    action: create
+    config: "{{ kind_cluster_config_path }}"
