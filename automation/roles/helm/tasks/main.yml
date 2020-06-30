@@ -19,4 +19,5 @@
     name: "{{ item.name }}"
     chart_ref: "{{ item.chart }}"
     release_namespace: "{{ item.namespace }}"
+    release_values: "{{ item.release_values | default({}) }}"
   with_items: "{{ helm_releases }}"

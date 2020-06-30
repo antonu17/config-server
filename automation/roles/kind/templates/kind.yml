@@ -4,5 +4,5 @@ nodes:
 - role: control-plane
   image: {{ kind_image }}
   extraPortMappings:
-  - containerPort: 80
-    hostPort: {{ kind_expose_port }}
+  - containerPort: {{ kind_port_mapping_container }}
+    hostPort: {{ kind_port_mapping_host }}

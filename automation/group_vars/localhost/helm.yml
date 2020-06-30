@@ -10,6 +10,12 @@ helm_releases:
   - name: nginx-ingress
     chart: stable/nginx-ingress
     namespace: default
+    release_values:
+      controller:
+        service:
+          nodePorts:
+            http: "{{ kind_port_mapping_container }}"
+
   - name: concourse
     chart: concourse/concourse
     namespace: default
