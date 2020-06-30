@@ -8,6 +8,15 @@
     - { role: kind,          tags: ["kind"]                }
     - { role: helm,          tags: ["helm"]                }
 
+  tasks:
+    - name: create /etc/hosts records
+      become: yes
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ item.address }} {{ item.host }}"
+        create: yes
+      with_items: "{{ hosts_records }}"
+
 - name: Cleanup
   hosts: localhost
   gather_facts: no
@@ -22,3 +31,10 @@
         path: "{{ kind_cluster_config_path }}"
         state: absent
       tags: [ never, cleanup ]
+    - name: delete /etc/hosts records
+      become: yes
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ item.address }} {{ item.host }}"
+        state: absent
+      with_items: "{{ hosts_records }}"
