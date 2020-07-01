@@ -45,7 +45,7 @@ To check out the demo you need to spin up the fully-fledged demo environment wit
 Developer system should have the following components
 
 * Git
-* Python (including pip and virtualenv)
+* Python 3.8 (including pip and -m venv)
 * Ansible
 * GNU Make
 * Docker
@@ -76,6 +76,10 @@ The entire demo environment is running on Kubernetes in Docker, using [`kind`][1
 ```bash
 git clone antonu17/config-server
 cd config-server/automation
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+ansible-galaxy collection install -r requirements.yml -p ./collections/
 ansible-playbook -i local.ini demo-environment.yml
 ```
 

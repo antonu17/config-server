@@ -17,7 +17,7 @@
         create: yes
       with_items: "{{ hosts_records }}"
 
-- name: Cleanup
+- name: Destroy demo kubernetes environment
   hosts: localhost
   gather_facts: no
   tasks:
@@ -26,11 +26,13 @@
         name: "{{ kind_cluster_name }}"
         action: delete
       tags: [ never, cleanup ]
+
     - name: delete kind cluster config
       file:
         path: "{{ kind_cluster_config_path }}"
         state: absent
       tags: [ never, cleanup ]
+
     - name: delete /etc/hosts records
       become: yes
       lineinfile:
@@ -38,3 +40,4 @@
         line: "{{ item.address }} {{ item.host }}"
         state: absent
       with_items: "{{ hosts_records }}"
+      tags: [ never, cleanup ]
