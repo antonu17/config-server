@@ -52,8 +52,7 @@ The REST API has the following methods implemented
 | List    | `GET`       | `/configs`
 | Create  | `POST`      | `/configs`
 | Get     | `GET`       | `/configs/{name}`
-| Replace | `PUT`       | `/configs/{name}`
-| Update  | `PATCH`     | `/configs/{name}`
+| Update  | `PUT/PATCH` | `/configs/{name}`
 | Delete  | `DELETE`    | `/configs/{name}`
 
 ## Development process
@@ -61,11 +60,11 @@ The REST API has the following methods implemented
 New features are added via pull requests. Before pushing changes to the upstream make sure all tests are passed.
 In order to simplify local development and testing there's a `Makefile` with the following goals defined:
 
-* `setup`: configure local `virtualenv` environment in `.venv` directory and installs required libraries
-* `clean`: remove `.venv` directory
+* `setup`: configure local `virtualenv` environment in `venv` directory and installs required libraries
+* `clean`: remove `venv` directory
 * `lint`: check code style with `flake8`
 * `test`: run unit tests with `python -m unittest`
-* `run`: spin up the server locally via `docker-compose`
+* `run`: spin up the server locally via `flask`
 * `build`: create `build` directory and copy all required runtime files into it
 * `artifact`: build a versioned docker image from `build` directory
 
