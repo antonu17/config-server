@@ -30,3 +30,5 @@ helm_releases:
         ingress:
           enabled: true
           hosts: ["{{ ci_host }}"]
+      worker:
+        replicas: 1
