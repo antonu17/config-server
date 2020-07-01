@@ -1,5 +1,38 @@
 # Config Server
 
+This is a demo project. The main 4 scopes of the demo are Programming, Automation, CI/CD, and Observability.
+
+Programming part is a REST API server written on Python
+
+- Code organization
+- Unit testing
+- 12 Factor compliance (to some extent)
+- API Documentation (RAML, Console)
+- Data access layer
+- Containerization
+- Packaging via [Helm][4]
+- Building automation via GNU Make
+
+Automation part for provisioning demo Kubernetes cluster is written on Ansible.
+
+- Use of various Ansible features: Galaxy Dependencies, Collections, Custom Modules, Roles, Playbooks, Variables, etc.
+- Use [Kind][1] to create demo Kubernetes cluster
+- Use [Helm][4] to deploy core components: Nginx Ingress, Concourse CI, Prometheus, Grafana, etc.
+- Use local artifact repositories: [registry][2] for docker images, [chartmuseum][5] for helm charts
+
+CI/CD part is a Concourse pipeline with 2 workflows: Testing Pull requests, and Building+Deployment a new version when PR is merged.
+
+- Use of YAML anchors to simplify pipeline code
+- Use of various Concourse features: Pipelines, Resources, Jobs, Tasks, Input/Output volumes, Parallel execution
+
+Observability part provides logging, metrics, traces collection and visualization.
+
+- Prometheus
+- Grafana Loki
+- Open telemetry
+- Grafana
+- Jaeger UI
+
 ## Purpose
 
 The `config-server` is an API server for storing and querying arbitrary JSON object via REST interface. Possible areas of application:
@@ -95,3 +128,5 @@ After kind cluster is operational, the following components are installed using 
 [1]: https://kind.sigs.k8s.io/
 [2]: https://hub.docker.com/_/registry
 [3]: https://concourse-ci.org/
+[4]: https://helm.sh/
+[5]: https://github.com/helm/chartmuseum
