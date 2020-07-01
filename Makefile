@@ -24,7 +24,7 @@ test:
 	@$(CURDIR)/$(VENV)/bin/python -m pytest tests/ -v
 
 run: setup
-	FLASK_APP=$(CURDIR)/src/main.py $(CURDIR)/$(VENV)/bin/flask run
+	$(CURDIR)/$(VENV)/bin/uwsgi --http 127.0.0.1:5000 --wsgi-file $(CURDIR)/src/main.py --callable app_dispatch
 
 build:
 artifact:

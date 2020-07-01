@@ -1,10 +1,19 @@
 import flask
 from flask import request, jsonify, abort, make_response
 
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from prometheus_client import make_wsgi_app, Counter
+
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
+REQUEST_COUNT = Counter('request_count', 'Number of requests', ['method', 'status'])
+
+# Add prometheus wsgi middleware to route /metrics requests
+app_dispatch = DispatcherMiddleware(app, {
+    '/metrics': make_wsgi_app()
+})
 
 config_entries = [
     {
@@ -13,9 +22,9 @@ config_entries = [
     }
 ]
 
-
 @app.route('/', methods=['GET'])
 def home():
+    REQUEST_COUNT.labels('get', '200').inc()
     return "config-server"
 
 
@@ -28,14 +37,17 @@ def config_list():
 def config_get(config_name):
     for config in config_entries:
         if config['name'] == config_name:
+            REQUEST_COUNT.labels('get', '200').inc()
             return jsonify(config)
 
+    REQUEST_COUNT.labels('get', '404').inc()
     abort(404)
 
 
 @app.route('/configs', methods=['POST'])
 def config_create():
     if not request.json or 'name' not in request.json or 'data' not in request.json:
+        REQUEST_COUNT.labels('post', '400').inc()
         abort(400)
 
     config_name = request.json['name']
@@ -44,6 +56,7 @@ def config_create():
     config = [e for e in config_entries if e['name'] == config_name]
 
     if len(config) != 0:
+        REQUEST_COUNT.labels('post', '409').inc()
         abort(409)
 
     config = {
@@ -51,21 +64,28 @@ def config_create():
         'data': config_data
     }
     config_entries.append(config)
+    REQUEST_COUNT.labels('post', '201').inc()
     return jsonify(config), 201
 
 
-@app.route('/configs/<string:config_name>', methods=['PUT'])
+@app.route('/configs/<string:config_name>', methods=['PUT','PATCH'])
 def update_task(config_name):
     config = [e for e in config_entries if e['name'] == config_name]
 
     if len(config) == 0:
+        REQUEST_COUNT.labels('put', '404').inc()
         abort(404)
     if not request.json:
+        REQUEST_COUNT.labels('put', '400').inc()
         abort(400)
     if 'name' not in request.json:
+        REQUEST_COUNT.labels('put', '400').inc()
         abort(400)
     if 'data' not in request.json:
+        REQUEST_COUNT.labels('put', '400').inc()
         abort(400)
+
+    REQUEST_COUNT.labels('put', '200').inc()
     return jsonify({'task': config[0]})
 
 
@@ -74,9 +94,11 @@ def delete_task(config_name):
     config = [e for e in config_entries if e['name'] == config_name]
 
     if len(config) == 0:
+        REQUEST_COUNT.labels('delete', '404').inc()
         abort(404)
 
     config_entries.remove(config[0])
+    REQUEST_COUNT.labels('delete', '200').inc()
     return jsonify({'result': True})
 
 
