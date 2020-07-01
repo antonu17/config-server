@@ -22,6 +22,7 @@ config_entries = [
     }
 ]
 
+
 @app.route('/', methods=['GET'])
 def home():
     REQUEST_COUNT.labels('get', '200').inc()
@@ -68,7 +69,7 @@ def config_create():
     return jsonify(config), 201
 
 
-@app.route('/configs/<string:config_name>', methods=['PUT','PATCH'])
+@app.route('/configs/<string:config_name>', methods=['PUT', 'PATCH'])
 def update_task(config_name):
     config = [e for e in config_entries if e['name'] == config_name]
 
