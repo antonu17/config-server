@@ -10,6 +10,9 @@ image_resource:
 inputs:
   - name: source-code
 
+caches:
+  - path: source-code/venv
+
 run:
   dir: source-code
   path: bash
