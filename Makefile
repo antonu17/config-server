@@ -20,7 +20,7 @@ requirements:
 lint:
 	@$(CURDIR)/$(VENV)/bin/flake8 src/ tests/
 
-test:
+test: setup
 	@$(CURDIR)/$(VENV)/bin/python -m pytest tests/ -v
 
 run: setup
