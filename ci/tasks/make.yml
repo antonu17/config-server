@@ -1,0 +1,22 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: python
+    tag: '3.8'
+
+inputs:
+  - name: source-code
+
+run:
+  dir: source-code
+  path: bash
+  args:
+    - -cxe
+    - |
+      make $MAKE_GOAL
+
+params:
+  MAKE_GOAL: ''
