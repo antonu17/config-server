@@ -1,0 +1,117 @@
+#%RAML 1.0
+---
+title: Config API
+baseUri: http://localhost:8080/
+version: v1
+
+types:
+  Config:
+    properties:
+      name:
+        type: string
+        required: true
+      data:
+        type: any
+        required: true
+
+/configs:
+  get:
+    description: Retrieve all config entries
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              [
+                {
+                  "name": "metrics",
+                  "data": "yes"
+                },
+                {
+                  "name": "pool_timeout",
+                  "data": {
+                    "connections": 5,
+                    "timeout": 10
+                  }
+                }
+              ]
+
+  post:
+    description: Add a new config entry
+    body:
+      application/json:
+        type: config
+
+    responses:
+      200:
+        body:
+          application/json:
+            type: config
+            example: |
+              { "name": "metrics", "data": "yes" }
+
+      409:
+        body:
+          application/json:
+            example: |
+              {"error": "Already exists"}
+
+  /{configName}:
+    description: Config entry
+
+    get:
+      description: Get the Config entry with `name = {configName}`
+
+      responses:
+        200:
+          body:
+            application/json:
+              type: config
+
+        404:
+          body:
+            application/json:
+              example: |
+                {"error": "Not found"}
+
+    put: &update
+      description: Update the Config entry with `name = {configName}`
+      body:
+        application/json:
+          type: config
+          example: |
+            { "name": "metrics", "data": "yes" }
+
+      responses:
+        200:
+          body:
+            application/json:
+              type: config
+              example: |
+                { "name": "metrics", "data": "yes" }
+
+        404:
+          body:
+            application/json:
+              example: |
+                {"error": "Not found"}
+
+    patch:
+      << : *update
+
+    delete:
+      description: Delete the Config entry with `name = {configName}`
+
+      responses:
+        200:
+          body:
+            application/json:
+              type: config
+              example: |
+                {"result": true}
+
+        404:
+          body:
+            application/json:
+              example: |
+                {"error": "Not found"}
