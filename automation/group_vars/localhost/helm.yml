@@ -32,6 +32,8 @@ helm_releases:
       web:
         ingress:
           enabled: true
+          annotations:
+            nginx.ingress.kubernetes.io/proxy-body-size: "0m"
           hosts: ["{{ ci_host }}"]
       worker:
         replicas: 1
