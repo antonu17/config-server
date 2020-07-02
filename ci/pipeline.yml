@@ -1,8 +1,14 @@
 resource_types:
 - name: pull-request
-  type: docker-image
+  type: registry-image
   source:
     repository: teliaoss/github-pr-resource
+
+- name: helm-chart
+  type: registry-image
+  source:
+    repository: jghiloni/helm-chart-resource
+    tag: v0.1.1
 
 resources:
 - name: pull-request
@@ -35,6 +41,12 @@ resources:
   source:
     insecure_registries: ((insecure_registries))
     repository: ((config_server_image))
+
+- name: config-server-helm-chart
+  type: helm-chart
+  source:
+    repository_url: http://helm-chart.example.tld:8080
+    chart: config-server
 
 jobs:
 - name: 'PR: Lint'
@@ -117,7 +129,13 @@ jobs:
         build: source-code
         cache: true
         tag_as_latest: true
-        tag_file: verison/verison
+        tag_file: version/version
+      get_params: { skip_download: true }
+
+    - put: config-server-helm-chart
+      params:
+        repository: source-code/helm/config-server
+        version_file: version/version
       get_params: { skip_download: true }
 
     - put: version
