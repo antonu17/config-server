@@ -9,6 +9,39 @@
     - { role: helm,          tags: ["helm"]                }
 
   tasks:
+    - name: update kind CoreDNS configuration
+      k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: coredns
+            namespace: kube-system
+          data:
+            Corefile: |
+              .:53 {
+                  rewrite name regex (.*)\.{{ tld_suffix }} nginx-ingress-controller.default.svc.cluster.local
+                  errors
+                  health {
+                    lameduck 5s
+                  }
+                  ready
+                  kubernetes cluster.local in-addr.arpa ip6.arpa {
+                    pods insecure
+                    fallthrough in-addr.arpa ip6.arpa
+                    ttl 30
+                  }
+                  prometheus :9153
+                  forward . /etc/resolv.conf
+                  cache 30
+                  loop
+                  reload
+                  loadbalance
+              }
+
+
+
     - name: create /etc/hosts records
       become: yes
       lineinfile:
