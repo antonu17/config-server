@@ -21,6 +21,21 @@ resources:
     uri: https://((github_token))@github.com/((github_org))/((github_repo)).git
     branch: master
 
+- name: version
+  type: semver
+  source:
+    driver: git
+    initial_version: 0.0.1
+    uri: https://((github_token))@github.com/((github_org))/((github_repo)).git
+    branch: version
+    file: version
+
+- name: config-server-image
+  type: docker-image
+  source:
+    insecure_registries: ((insecure_registries))
+    repository: ((config_server_image))
+
 jobs:
 - name: 'PR: Lint'
   plan:
@@ -88,13 +103,25 @@ jobs:
 
 - name: 'Release'
   plan:
-    - get: source-code
-      passed: ['Lint', 'Test']
-      trigger: true
-    - task: make test
-      file: source-code/ci/tasks/make.yml
+    - in_parallel:
+        steps:
+        - get: source-code
+          passed: [ 'Lint', 'Test' ]
+          trigger: true
+        - get: version
+          params:
+            bump: minor
+
+    - put: config-server-image
       params:
-        MAKE_GOAL: build
+        build: source-code
+        cache: true
+        tag_as_latest: true
+        tag_file: verison/verison
+      get_params: { skip_download: true }
+
+    - put: version
+      params: {file: version/version}
 
 - name: 'Deploy'
   plan:

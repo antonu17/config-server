@@ -1,4 +1,5 @@
 github_org: antonu17
 github_repo: config-server
 github_token: set github_token here
-config_server_image: antonu17/config-server
+config_server_image: docker.example.tld:8080/config-server
+insecure_registries: [ docker.example.tld:8080 ]
