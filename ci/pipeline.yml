@@ -10,6 +10,11 @@ resource_types:
     repository: jghiloni/helm-chart-resource
     tag: v0.1.1
 
+- name: helm
+  type: registry-image
+  source:
+    repository: linkyard/concourse-helm-resource
+
 resources:
 - name: pull-request
   type: pull-request
@@ -47,6 +52,14 @@ resources:
   source:
     repository_url: http://helm-chart.example.tld:8080
     chart: config-server
+
+- name: config-server-helm
+  type: helm
+  source:
+    cluster_url: https://kubernetes
+    repos:
+      - name: demo
+        url: http://helm-chart.example.tld:8080
 
 jobs:
 - name: 'PR: Lint'
@@ -147,3 +160,6 @@ jobs:
     - get: source-code
       trigger: true
       passed: ['Release']
+    - put: config-server-helm
+      params:
+        chart: demo/config-server
