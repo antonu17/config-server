@@ -128,8 +128,9 @@ jobs:
       params:
         build: source-code
         cache: true
-        tag_as_latest: true
+        cache_tag: latest
         tag_file: version/version
+        tag_as_latest: true
       get_params: { skip_download: true }
 
     - put: config-server-helm-chart
