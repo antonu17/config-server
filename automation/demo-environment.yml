@@ -50,6 +50,13 @@
         create: yes
       with_items: "{{ hosts_records }}"
 
+    - name: display hostnames
+      debug:
+        msg:
+          - "Concourse CI:  http://{{ ci_host }}:{{ kind_port_mapping_host }}"
+          - "Config-server: http://{{ api_host }}:{{ kind_port_mapping_host }}"
+          - "Chartmuseum:   http://{{ helm_host }}:{{ kind_port_mapping_host }}"
+
 - name: Destroy demo kubernetes environment
   hosts: localhost
   gather_facts: no
