@@ -19,11 +19,13 @@ Automation part for provisioning demo Kubernetes cluster is written on Ansible.
 - Use [Kind][1] to create demo Kubernetes cluster
 - Use [Helm][4] to deploy core components: Nginx Ingress, Concourse CI, Prometheus, Grafana, etc.
 - Use local artifact repositories: [registry][2] for docker images, [chartmuseum][5] for helm charts
+- Expose service running inside k8s cluster via Nginx Ingress and Kind port forwarding
 
 CI/CD part is a Concourse pipeline with 2 workflows: Testing Pull requests, and Building+Deployment a new version when PR is merged.
 
 - Use of YAML anchors to simplify pipeline code
 - Use of various Concourse features: Pipelines, Resources, Jobs, Tasks, Input/Output volumes, Parallel execution
+- Repository for container images and helm chart are running on the same Kubernetes cluster and available from inside the cluster and developer workstation
 
 Observability part provides logging, metrics, traces collection and visualization.
 
@@ -105,8 +107,14 @@ The entire demo environment is running on Kubernetes in Docker, using [`kind`][1
 * CI/CD platform. I've chosen [Concourse CI][3]
 * Observability stack
 
+How to start everything up:
+
+1. Fork this repository, because CI pipeline that running inside the cluster will need your github token to use Github API
+2. Export your Github token via `GITHUB_TOKEN` environment variable. Your Github must have `repo` access level.
+3. Run the following commands in your shell:
+
 ```bash
-git clone antonu17/config-server
+git clone https://github.com/<YOUR_USERNAME>/config-server.git
 cd config-server/automation
 python -m venv venv
 source venv/bin/activate
@@ -119,10 +127,38 @@ To deploy `kind` cluster with ansible I didn't find Ansible module I also didn't
 or `command` module to run `kind` cli, so I decided to write a simple module that can create, delete,
 and check status of the `kind` cluster.
 
-After kind cluster is operational, the following components are installed using Helm v3:
+Here is brief list of what does the ansible automation do:
 
-* nginx-ingress controller
-* concourse
+* Create KIND cluster with port-forwarding 127.0.0.1:8080 to nginx-ingress controller port on kubernetes
+* Patch KIND cluster CoreDNS configuration to make demo hostnames resolvable inside Kubernetes cluster
+* Deploy Nginx Ingress controller
+* Deploy concourse CI
+* Deploy Docker Registry
+* Deploy Chartmuseum
+* Update local `/etc/hosts` to make service exposed via Ingress reachable from developer workstation
+* Deploy CI Pipeline to concourse
+* Output URLs where services are running
+
+After ansible successfully finished open http://ci.example.tld:8080/teams/main/pipelines/config-server and wait for `Deploy` job is completed.
+
+After that the Config Server API should be available on http://api.example.tld:8080
+Try opening a Pull Request to your fork and check out how does pipeline react. After Pull Request is merged, the Pipeline will build and deploy newer version of the server.
+
+
+## Cleanup demo environment
+
+Because everything is running inside KIND kubernetes cluster, which in turns just a single docker container,
+running on the developer's workstation, the cleanup is as simple as removing the container, and cleaning up
+records that were created in local `/etc/hosts`. To cleanup you can run ansible automation as in the example below:
+
+```bash
+ansible-playbook -i local.ini demo-environment.yml -t cleanup
+```
+
+Here is brief list of what does the ansible automation do:
+
+* Terminate KIND kubernetes cluster
+* Remove records from local `/etc/hosts`
 
 [1]: https://kind.sigs.k8s.io/
 [2]: https://hub.docker.com/_/registry
