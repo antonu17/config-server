@@ -20,7 +20,7 @@ version = "unknown"
 try:
     with open("version.txt", "r") as f:
         version = f.readline().strip()
-except:
+except Exception:
     pass
 
 
