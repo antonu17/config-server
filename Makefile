@@ -1,4 +1,9 @@
-VENV ?= venv
+VENV         ?= venv
+BUILD_DIR    ?= build
+SRC_DIR      ?= src
+TESTS_DIR    ?= tests
+DOCKER_REPO  ?= config-server
+VERSION      ?= $(shell git describe --tags --always --dirty)
 
 .ONESHELL:
 .PHONY: setup virtualenv clean requirements-dev requirements lint test run build artifact
@@ -6,25 +11,33 @@ VENV ?= venv
 setup: virtualenv requirements-dev
 
 virtualenv:
-	@python -m venv $(CURDIR)/$(VENV)
+	@python -m venv $(VENV)
 
 clean:
-	@rm -rf $(CURDIR)/$(VENV)
+	@rm -rf $(VENV)
+	@rm -rf $(BUILD_DIR)
+	@rm -rf $(SRC_DIR)/__pycache__
 
 requirements-dev:
-	@$(CURDIR)/$(VENV)/bin/pip install -r requirements-dev.txt
+	@$(VENV)/bin/pip install -r requirements-dev.txt
 
 requirements:
-	@$(CURDIR)/$(VENV)/bin/pip install -r requirements.txt
+	@$(VENV)/bin/pip install -r requirements.txt
 
 lint: virtualenv requirements-dev
-	@$(CURDIR)/$(VENV)/bin/flake8 src/ tests/
+	@$(VENV)/bin/flake8 $(SRC_DIR) $(TESTS_DIR)
 
 test: virtualenv requirements-dev
-	@$(CURDIR)/$(VENV)/bin/python -m pytest tests/ -v
+	@$(VENV)/bin/python -m pytest $(TESTS_DIR) -v
 
 run: virtualenv requirements-dev
-	$(CURDIR)/$(VENV)/bin/uwsgi --http 127.0.0.1:5000 --wsgi-file $(CURDIR)/src/main.py --callable app_dispatch
+	$(VENV)/bin/uwsgi --http 127.0.0.1:5000 --wsgi-file $(SRC_DIR)/main.py --callable app_dispatch
 
 build: virtualenv requirements
+	@mkdir -p $(BUILD_DIR)
+	@cp -a $(VENV) $(BUILD_DIR)
+	@cp -a $(SRC_DIR)/* $(BUILD_DIR)
+	@echo $(VERSION) >$(BUILD_DIR)/version.txt
+
 artifact:
+	docker build --rm --tag "$(DOCKER_REPO):$(VERSION)" --build-arg VERSION="$(VERSION)" .
