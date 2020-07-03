@@ -3,6 +3,15 @@
     src: pipeline-vars.yml.j2
     dest: "{{ ci_pipeline_vars_file }}"
 
+- name: "wait for concourse to come up"
+  uri:
+    url: "{{ ci_concourse_url }}"
+    status_code: "200"
+  register: result
+  until: result.status == 200
+  retries: 60
+  delay: 1
+
 - name: fetch fly from concourse server
   get_url:
     url: "{{ ci_concourse_url }}{{ ci_fly_url[ansible_system] }}"
