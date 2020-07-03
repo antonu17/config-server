@@ -56,6 +56,7 @@ resources:
 - name: config-server-helm
   type: helm
   source:
+    release: config-server
     cluster_url: ((kubernetes_cluster_url))
     cluster_ca: ((kubernetes_cluster_ca))
     admin_cert: ((kubernetes_admin_cert))
@@ -140,9 +141,29 @@ jobs:
           params:
             bump: minor
 
+    - task: create build args
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: busybox
+        inputs:
+          - name: version
+        outputs:
+          - name: build-args
+        run:
+          path: /bin/sh
+          args:
+            - -cx
+            - |
+              echo '{"VERSION": "'$(cat version/version)'"}' > build-args/build-args
+              cat build-args/build-args
+
     - put: config-server-image
       params:
         build: source-code
+        build_args_file:  build-args/build-args
         cache: true
         cache_tag: latest
         tag_file: version/version
@@ -160,9 +181,18 @@ jobs:
 
 - name: 'Deploy'
   plan:
-    - get: source-code
-      trigger: true
-      passed: ['Release']
+    - in_parallel:
+        steps:
+        - get: source-code
+          trigger: true
+          passed: ['Release']
+        - get: version
+          passed: ['Release']
+
     - put: config-server-helm
       params:
         chart: demo/config-server
+        override_values:
+        - key: image.tag
+          path: version/version
+          type: string
