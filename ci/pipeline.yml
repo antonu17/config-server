@@ -187,6 +187,7 @@ jobs:
           trigger: true
           passed: ['Release']
         - get: version
+          trigger: true
           passed: ['Release']
 
     - put: config-server-helm
