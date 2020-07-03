@@ -53,10 +53,10 @@
     - name: display hostnames
       debug:
         msg:
-          - "Concourse CI:  http://{{ ci_host }}:{{ kind_port_mapping_host }}"
-          - "Config-server: http://{{ api_host }}:{{ kind_port_mapping_host }}"
-          - "Chartmuseum:   http://{{ helm_host }}:{{ kind_port_mapping_host }}"
-          - "Docker Registry:   http://{{ docker_host }}:{{ kind_port_mapping_host }}/v2/_catalog"
+          - "Concourse CI:    http://{{ ci_host }}:{{ kind_port_mapping_host }}"
+          - "Config-server:   http://{{ api_host }}:{{ kind_port_mapping_host }}"
+          - "Chartmuseum:     http://{{ helm_host }}:{{ kind_port_mapping_host }}"
+          - "Docker Registry: http://{{ docker_host }}:{{ kind_port_mapping_host }}/v2/_catalog"
 
 - name: Destroy demo kubernetes environment
   hosts: localhost

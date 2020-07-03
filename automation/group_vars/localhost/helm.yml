@@ -50,6 +50,9 @@ helm_releases:
   - name: chartmuseum
     chart: stable/chartmuseum
     release_values:
+      env:
+        open:
+          DISABLE_API: false
       ingress:
         enabled: true
         annotations:
