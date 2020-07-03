@@ -1,6 +1,8 @@
 ci_concourse_url: "http://{{ ci_host }}:{{ kind_port_mapping_host }}"
 ci_user: demo
 ci_pass: demo
+ci_pipeline_vars_file: "{{ ansible_env.TMPDIR }}/pipeline-vars.yml"
+ci_fly_path: "{{ ansible_env.TMPDIR }}/fly"
 
 ci_github_org: antonu17
 ci_github_repo: config-server

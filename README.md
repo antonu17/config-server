@@ -111,7 +111,8 @@ How to start everything up:
 
 1. Fork this repository, because CI pipeline that running inside the cluster will need your github token to use Github API
 2. Export your Github token via `GITHUB_TOKEN` environment variable. Your Github must have `repo` access level.
-3. Run the following commands in your shell:
+3. Update `automation/group_vars/localhost/ci.yml` set `ci_github_org` to your github username.
+4. Run the following commands in your shell:
 
 ```bash
 git clone https://github.com/<YOUR_USERNAME>/config-server.git
