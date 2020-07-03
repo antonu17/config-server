@@ -7,8 +7,8 @@ resource_types:
 - name: helm-chart
   type: registry-image
   source:
-    repository: jghiloni/helm-chart-resource
-    tag: v0.1.1
+    repository: cathive/concourse-chartmuseum-resource
+    tag: latest
 
 - name: helm
   type: registry-image
@@ -50,8 +50,8 @@ resources:
 - name: config-server-helm-chart
   type: helm-chart
   source:
-    repository_url: http://helm-chart.example.tld:8080
-    chart: config-server
+    server_url: http://helm-chart.example.tld:8080/api/charts
+    chart_name: config-server
 
 - name: config-server-helm
   type: helm
@@ -151,7 +151,7 @@ jobs:
 
     - put: config-server-helm-chart
       params:
-        repository: source-code/helm/config-server
+        chart: source-code/helm/config-server
         version_file: version/version
       get_params: { skip_download: true }
 
