@@ -13,7 +13,7 @@ resource_types:
 - name: helm
   type: registry-image
   source:
-    repository: linkyard/concourse-helm-resource
+    repository: typositoire/concourse-helm3-resource
 
 resources:
 - name: pull-request
@@ -56,7 +56,10 @@ resources:
 - name: config-server-helm
   type: helm
   source:
-    cluster_url: https://kubernetes
+    cluster_url: ((kubernetes_cluster_url))
+    cluster_ca: ((kubernetes_cluster_ca))
+    admin_cert: ((kubernetes_admin_cert))
+    admin_key: ((kubernetes_admin_key))
     repos:
       - name: demo
         url: http://helm-chart.example.tld:8080

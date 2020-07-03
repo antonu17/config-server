@@ -3,3 +3,7 @@ github_repo: config-server
 github_token: set github_token here
 config_server_image: docker.example.tld:8080/config-server
 insecure_registries: [ docker.example.tld:8080 ]
+kubernetes_cluster_url:
+kubernetes_cluster_ca:
+kubernetes_admin_cert:
+kubernetes_admin_key:
