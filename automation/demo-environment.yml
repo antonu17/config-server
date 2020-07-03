@@ -9,6 +9,17 @@
     - { role: helm,          tags: ["helm"]                }
     - { role: ci,            tags: ["ci"]                  }
 
+  pre_tasks:
+    - name: create /etc/hosts records
+      become: yes
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ item.address }} {{ item.host }}"
+        create: yes
+      with_items: "{{ hosts_records }}"
+      tags: ["hosts"]
+
+
   tasks:
     - name: update kind CoreDNS configuration
       k8s:
@@ -40,15 +51,6 @@
                   reload
                   loadbalance
               }
-      tags: ["hosts"]
-
-    - name: create /etc/hosts records
-      become: yes
-      lineinfile:
-        path: /etc/hosts
-        line: "{{ item.address }} {{ item.host }}"
-        create: yes
-      with_items: "{{ hosts_records }}"
       tags: ["hosts"]
 
     - name: display hostnames
