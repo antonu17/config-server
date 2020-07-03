@@ -22,12 +22,12 @@ helm_releases:
     namespace: default
     release_values:
       secrets:
-        localUsers: "demo:demo"
+        localUsers: "{{ ci_user }}:{{ ci_pass }}"
       concourse:
         web:
           auth:
             mainTeam:
-              localUser: "demo"
+              localUser: "{{ ci_user }}"
           externalUrl: "http://{{ ci_host }}:{{ kind_port_mapping_host }}"
       web:
         ingress:
