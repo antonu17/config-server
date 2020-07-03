@@ -1,0 +1,22 @@
+- name: create pipeline variables
+  template:
+    src: pipeline-vars.yml.j2
+    dest: "{{ ci_pipeline_vars_file }}"
+
+- name: fetch fly from concourse server
+  get_url:
+    url: "{{ ci_concourse_url }}{{ ci_fly_url[ansible_system] }}"
+    dest: "{{ ci_fly_path }}"
+    mode: 0755
+
+- name: login to cluster
+  command: "{{ ci_fly_path }} -t demo login -c {{ ci_concourse_url }} -u {{ ci_user }} -p {{ ci_pass }}"
+  changed_when: false
+
+- name: set pipeline
+  command: "{{ ci_fly_path }} -t demo set-pipeline -p config-server -c ../ci/pipeline.yml -l {{ ci_pipeline_vars_file }} --non-interactive"
+  changed_when: false
+
+- name: un-pause pipeline
+  command: "{{ ci_fly_path }} -t demo unpause-pipeline -p config-server"
+  changed_when: false

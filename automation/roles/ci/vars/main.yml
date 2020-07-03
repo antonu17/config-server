@@ -1,0 +1,5 @@
+ci_pipeline_vars_file: "{{ ansible_env.TMPDIR }}/pipeline-vars.yml"
+ci_fly_path: "{{ ansible_env.TMPDIR }}/fly"
+ci_fly_url:
+  Darwin: /api/v1/cli?arch=amd64&platform=darwin
+  Linux: /api/v1/cli?arch=amd64&platform=linux
