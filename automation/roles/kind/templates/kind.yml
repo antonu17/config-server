@@ -1,5 +1,9 @@
 apiVersion: kind.x-k8s.io/v1alpha4
 kind: Cluster
+containerdConfigPatches:
+- |-
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."{{ docker_host }}:{{ kind_port_mapping_host }}"]
+    endpoint = ["http://{{ docker_host }}:{{ kind_port_mapping_container }}"]
 nodes:
 - role: control-plane
   image: {{ kind_image }}

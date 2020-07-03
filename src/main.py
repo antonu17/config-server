@@ -8,12 +8,21 @@ from prometheus_client import make_wsgi_app, Counter
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
-REQUEST_COUNT = Counter('request_count', 'Number of requests', ['method', 'status'])
 
 # Add prometheus wsgi middleware to route /metrics requests
+REQUEST_COUNT = Counter('request_count', 'Number of requests', ['method', 'status'])
 app_dispatch = DispatcherMiddleware(app, {
     '/metrics': make_wsgi_app()
 })
+
+
+version = "unknown"
+try:
+    with open("version.txt", "r") as f:
+        version = f.readline().strip()
+except Exception:
+    pass
+
 
 config_entries = [
     {
@@ -22,10 +31,14 @@ config_entries = [
     }
 ]
 
+
 @app.route('/', methods=['GET'])
 def home():
     REQUEST_COUNT.labels('get', '200').inc()
-    return "config-server"
+    return jsonify(dict(
+        app="config-server",
+        version=version
+    ))
 
 
 @app.route('/configs', methods=['GET'])
@@ -68,7 +81,7 @@ def config_create():
     return jsonify(config), 201
 
 
-@app.route('/configs/<string:config_name>', methods=['PUT','PATCH'])
+@app.route('/configs/<string:config_name>', methods=['PUT', 'PATCH'])
 def update_task(config_name):
     config = [e for e in config_entries if e['name'] == config_name]
 

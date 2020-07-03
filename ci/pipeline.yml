@@ -1,0 +1,198 @@
+resource_types:
+- name: pull-request
+  type: registry-image
+  source:
+    repository: teliaoss/github-pr-resource
+
+- name: helm-chart
+  type: registry-image
+  source:
+    repository: cathive/concourse-chartmuseum-resource
+    tag: latest
+
+- name: helm
+  type: registry-image
+  source:
+    repository: typositoire/concourse-helm3-resource
+
+resources:
+- name: pull-request
+  type: pull-request
+  icon: source-branch
+  check_every: 1m # better to go with 24h here + github webhooks
+  source:
+    repository: ((github_org))/((github_repo))
+    access_token: ((github_token))
+
+- name: source-code
+  type: git
+  icon: github
+  check_every: 1m # better to go with 24h here + github webhooks
+  source:
+    uri: https://((github_token))@github.com/((github_org))/((github_repo)).git
+    branch: master
+
+- name: version
+  type: semver
+  source:
+    driver: git
+    initial_version: 0.0.1
+    uri: https://((github_token))@github.com/((github_org))/((github_repo)).git
+    branch: version
+    file: version
+
+- name: config-server-image
+  type: docker-image
+  source:
+    insecure_registries: ((insecure_registries))
+    repository: ((config_server_image))
+
+- name: config-server-helm-chart
+  type: helm-chart
+  source:
+    server_url: http://helm-chart.example.tld:8080/api/charts
+    chart_name: config-server
+
+- name: config-server-helm
+  type: helm
+  source:
+    release: config-server
+    cluster_url: ((kubernetes_cluster_url))
+    cluster_ca: ((kubernetes_cluster_ca))
+    admin_cert: ((kubernetes_admin_cert))
+    admin_key: ((kubernetes_admin_key))
+    repos:
+      - name: demo
+        url: http://helm-chart.example.tld:8080
+
+jobs:
+- name: 'PR: Lint'
+  plan:
+    - get: source-code
+      resource: pull-request
+      trigger: true
+
+    - task: make lint
+      file: source-code/ci/tasks/make.yml
+      params:
+        MAKE_GOAL: lint
+      on_failure:
+        put: pull-request
+        params:
+          path: source-code
+          context: lint
+          status: failure
+
+    - put: pull-request
+      params:
+        path: source-code
+        context: lint
+        status: success
+
+- name: 'PR: Test'
+  plan:
+    - get: source-code
+      resource: pull-request
+      trigger: true
+
+    - task: make test
+      file: source-code/ci/tasks/make.yml
+      params:
+        MAKE_GOAL: test
+      on_failure:
+        put: pull-request
+        params:
+          path: source-code
+          context: test
+          status: failure
+
+    - put: pull-request
+      params:
+        path: source-code
+        context: test
+        status: success
+
+- name: 'Lint'
+  plan:
+    - get: source-code
+      trigger: true
+    - task: make lint
+      file: source-code/ci/tasks/make.yml
+      params:
+        MAKE_GOAL: lint
+
+- name: 'Test'
+  plan:
+    - get: source-code
+      trigger: true
+    - task: make test
+      file: source-code/ci/tasks/make.yml
+      params:
+        MAKE_GOAL: test
+
+- name: 'Release'
+  plan:
+    - in_parallel:
+        steps:
+        - get: source-code
+          passed: [ 'Lint', 'Test' ]
+          trigger: true
+        - get: version
+          params:
+            bump: minor
+
+    - task: create build args
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: busybox
+        inputs:
+          - name: version
+        outputs:
+          - name: build-args
+        run:
+          path: /bin/sh
+          args:
+            - -cx
+            - |
+              echo '{"VERSION": "'$(cat version/version)'"}' > build-args/build-args
+              cat build-args/build-args
+
+    - put: config-server-image
+      params:
+        build: source-code
+        build_args_file:  build-args/build-args
+        cache: true
+        cache_tag: latest
+        tag_file: version/version
+        tag_as_latest: true
+      get_params: { skip_download: true }
+
+    - put: config-server-helm-chart
+      params:
+        chart: source-code/helm/config-server
+        version_file: version/version
+      get_params: { skip_download: true }
+
+    - put: version
+      params: {file: version/version}
+
+- name: 'Deploy'
+  plan:
+    - in_parallel:
+        steps:
+        - get: source-code
+          trigger: true
+          passed: ['Release']
+        - get: version
+          passed: ['Release']
+
+    - put: config-server-helm
+      params:
+        chart: demo/config-server
+        override_values:
+        - key: image.tag
+          path: version/version
+          type: string

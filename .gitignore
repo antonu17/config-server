@@ -1,3 +1,6 @@
 **/ansible_collections/
 **/venv/
 **/__pycache__/
+.vars.yml
+build/
+version.txt

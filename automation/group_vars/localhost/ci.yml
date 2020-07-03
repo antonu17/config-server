@@ -1,0 +1,13 @@
+ci_concourse_url: "http://{{ ci_host }}:{{ kind_port_mapping_host }}"
+ci_user: demo
+ci_pass: demo
+
+ci_github_org: antonu17
+ci_github_repo: config-server
+ci_github_token: "{{ lookup('env', 'GITHUB_TOKEN') }}"
+ci_config_server_image: "{{ docker_host }}:{{ kind_port_mapping_host }}/config-server"
+ci_insecure_registries: [ "{{ docker_host }}:{{ kind_port_mapping_host }}" ]
+ci_kubernetes_cluster_url: https://10.96.0.1
+ci_kubernetes_cluster_ca: "{{ lookup('pipe', cacert_cmd) }}"
+ci_kubernetes_admin_cert: "{{ lookup('pipe', cert_cmd) }}"
+ci_kubernetes_admin_key: "{{ lookup('pipe', key_cmd) }}"

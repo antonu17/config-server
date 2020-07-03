@@ -9,3 +9,5 @@ kind_preload_images:
   - docker.io/bitnami/minideb:stretch
   - quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.32.0
   - k8s.gcr.io/defaultbackend-amd64:1.5
+  - registry:2.7.1
+  - chartmuseum/chartmuseum:v0.12.0
