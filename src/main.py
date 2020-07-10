@@ -36,7 +36,7 @@ config_entries = [
 def home():
     REQUEST_COUNT.labels('get', '200').inc()
     return jsonify(dict(
-        app="config-server",
+        app="config-service",
         version=version
     ))
 
