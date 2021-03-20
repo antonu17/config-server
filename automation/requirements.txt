@@ -7,7 +7,7 @@ cryptography==2.9.2
 docker==4.2.2
 google-auth==1.18.0
 idna==2.10
-Jinja2==2.11.2
+Jinja2==2.11.3
 kubernetes==11.0.0
 MarkupSafe==1.1.1
 oauthlib==3.1.0
