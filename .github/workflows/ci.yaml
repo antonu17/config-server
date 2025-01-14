@@ -61,6 +61,8 @@ jobs:
 
     steps:
       - name: Trigger deployment pipeline
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           echo "Deploying to production environment..."
           gh auth status
