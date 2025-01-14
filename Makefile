@@ -11,7 +11,7 @@ VERSION      ?= $(shell git describe --tags --always --dirty)
 setup: virtualenv requirements-dev
 
 virtualenv:
-	@python -m venv $(VENV)
+	@python3 -m venv $(VENV)
 
 clean:
 	@rm -rf $(VENV)
