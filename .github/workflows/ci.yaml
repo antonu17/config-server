@@ -46,6 +46,7 @@ jobs:
           file: ./Dockerfile
 
       - name: Attest
+        if: github.ref == 'refs/heads/master'
         uses: actions/attest-build-provenance@v2
         id: attest
         with:
