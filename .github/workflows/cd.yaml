@@ -1,0 +1,21 @@
+name: Deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+    secrets:
+      token:
+        required: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Perform Deployment
+        run: |
+          echo "Deploying to ${{inputs.environment}} ..."
+          echo "using token ${{secrets.token}}"

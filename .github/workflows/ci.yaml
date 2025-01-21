@@ -55,14 +55,9 @@ jobs:
           push-to-registry: true
 
   deploy:
-    runs-on: ubuntu-latest
     needs: ci-pipeline
-    if: github.ref == 'refs/heads/master'
-
-    steps:
-      - name: Trigger deployment pipeline
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          echo "Deploying to production environment..."
-          gh auth status
+    uses: ./.github/workflows/cd.yaml
+    with:
+      environment: production
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
