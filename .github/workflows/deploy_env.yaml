@@ -9,11 +9,6 @@ on:
 env:
   GH_TOKEN: ${{ github.token }}
 
-permissions:
-  contents: read
-  deployments: write
-  id-token: write
-
 jobs:
   deploy:
     name: ${{inputs.environment}}
