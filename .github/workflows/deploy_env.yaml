@@ -18,7 +18,7 @@ jobs:
       - name: Trigger
         run: |
           echo "Deploying to ${{inputs.environment}}"
-          gh api repos/:owner/:repo/deployments \
+          gh api repos/${{github.repository}}/deployments \
             -f "ref=${{ github.ref }}" \
             -f "environment=${{inputs.environment}}" \
             -f "auto_merge=false" \
