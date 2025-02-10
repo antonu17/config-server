@@ -1,23 +1,24 @@
-name: Deploy
+name: CD Pipeline
 
 on:
   workflow_call:
-    inputs:
-      environment:
-        required: true
-        type: string
-    secrets:
-      token:
-        required: true
+
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    name: ${{inputs.environment}}
-    environment: ${{inputs.environment}}
+  deploy_dev:
+    name: dev
+    uses: ./.github/workflows/deploy_env.yaml
+    with:
+      environment: dev
 
-    steps:
+  deploy_staging:
+    name: staging
+    uses: ./.github/workflows/deploy_env.yaml
+    with:
+      environment: staging
 
-      - name: Perform Deployment
-        run: |
-          echo "Deploying to ${{inputs.environment}} ..."
-          echo "using token ${{secrets.token}}"
+  deploy_live:
+    name: live
+    needs: deploy_staging
+    uses: ./.github/workflows/deploy_env.yaml
+    with:
+      environment: live
