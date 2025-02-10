@@ -19,9 +19,8 @@ jobs:
         run: |
           echo "Deploying to ${{inputs.environment}}"
           gh api repos/${{github.repository}}/deployments \
-            -F "ref=${{ github.ref }}" \
+            -F "ref=${{ github.sha }}" \
             -F "environment=${{inputs.environment}}" \
             -F "auto_merge=false" \
-            -F "description=Deploying ${{ github.ref }} to ${{inputs.environment}}" \
-            -F "task=deploy" \
-            -F "required_contexts: []"
+            -F "description=Deploying ${{ github.sha }} to ${{inputs.environment}}" \
+            -F "task=deploy"
