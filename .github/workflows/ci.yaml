@@ -55,6 +55,6 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
 
-  cd-pipeline:
+  deploy:
     needs: ci-pipeline
     uses: ./.github/workflows/cd.yaml
