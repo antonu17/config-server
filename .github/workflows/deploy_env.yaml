@@ -24,4 +24,4 @@ jobs:
             -F "auto_merge=false" \
             -F "description=Deploying ${{ github.ref }} to ${{inputs.environment}}" \
             -F "task=deploy" \
-            -F "required_contexts=[]"
+            -F "required_contexts: []"
