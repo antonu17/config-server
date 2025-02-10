@@ -8,7 +8,7 @@ on:
         type: string
 
 jobs:
-  deploy_dev:
+  deploy:
     name: ${{inputs.environment}}
     runs-on: ubuntu-latest
     environment: ${{inputs.environment}}
@@ -16,3 +16,9 @@ jobs:
       - name: Trigger
         run: |
           echo "Deploying to ${{inputs.environment}}"
+          gh api repos/:owner/:repo/deployments \
+            -f "ref=${{ github.ref }}" \
+            -f "environment=${{inputs.environment}}" \
+            -f "auto_merge=false" \
+            -f "description=Deploying ${{ github.ref }} to ${{inputs.environment}}" \
+            -f "task=deploy"

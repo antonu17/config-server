@@ -18,6 +18,7 @@ jobs:
 
   deploy_live:
     name: deploy
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     needs: deploy_staging
     uses: ./.github/workflows/deploy_env.yaml
     with:
