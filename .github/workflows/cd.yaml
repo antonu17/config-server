@@ -5,19 +5,19 @@ on:
 
 jobs:
   deploy_dev:
-    name: dev
+    name: deploy
     uses: ./.github/workflows/deploy_env.yaml
     with:
       environment: dev
 
   deploy_staging:
-    name: staging
+    name: deploy
     uses: ./.github/workflows/deploy_env.yaml
     with:
       environment: staging
 
   deploy_live:
-    name: live
+    name: deploy
     needs: deploy_staging
     uses: ./.github/workflows/deploy_env.yaml
     with:
