@@ -23,4 +23,5 @@ jobs:
             -F "environment=${{inputs.environment}}" \
             -F "auto_merge=false" \
             -F "description=Deploying ${{ github.sha }} to ${{inputs.environment}}" \
-            -F "task=deploy"
+            -F "task=deploy" \
+            -F "required_contexts[]"
