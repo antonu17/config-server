@@ -21,6 +21,6 @@ jobs:
           gh api repos/${{github.repository}}/deployments \
             -f "ref=${{ github.ref }}" \
             -f "environment=${{inputs.environment}}" \
-            -f "auto_merge=false" \
+            -F "auto_merge=false" \
             -f "description=Deploying ${{ github.ref }} to ${{inputs.environment}}" \
             -f "task=deploy"
