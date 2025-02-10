@@ -57,7 +57,3 @@ jobs:
   deploy:
     needs: ci-pipeline
     uses: ./.github/workflows/cd.yaml
-    with:
-      environment: Dev
-    secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
